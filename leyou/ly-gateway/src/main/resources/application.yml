@@ -1,0 +1,54 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: api-gateway
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 单个文件上传的大小
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+zuul:
+  prefix: /api # 添加路由前缀
+  routes:
+    item-service: /item/**
+    search-service: /search/**
+    user-service: /user/**
+    auth-service: /auth/**
+    cart-service: /cart/**
+    order-service: /order/**
+    upload-service:
+      path: /upload/**
+      service: upload-service
+      strip-prefix: false
+  add-host-header: true   # 网关在代理时，允许请求携带本身的host头信息
+  sensitive-headers=:     # 禁止使用的头信息，设置为null，否则set-cookie无效
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 5000 # 熔断超时时长：5000ms
+ribbon:
+  ConnectTimeout: 1000 # 连接超时时间(ms)
+  ReadTimeout: 3500 # 通信超时时间(ms)
+  MaxAutoRetriesNextServer: 0 # 同一服务不同实例的重试次数
+  MaxAutoRetries: 0 # 同一实例的重试次数
+ly:
+  jwt:
+    pubKeyPath: F:\my_java\leyou\javacode\rsa\rsa.pub # 公钥地址
+    cookieName: LY_TOKEN  #cookie名字
+  filter:
+    allowPaths:
+      - /api/auth
+      - /api/search
+      - /api/user/register
+      - /api/user/check
+      - /api/user/code
+      - /api/item
